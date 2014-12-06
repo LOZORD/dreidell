@@ -1,39 +1,57 @@
 -- Dreidel/Sivivon game written in Haskell
--- By Leo Rudberg (LOZORD) in 2014
+-- By Leo Rudberg (LOZORD) in 2014 (with a lot of guidance from Mike Tolly)
 
 module Main where
-  data Dreidel = Nun | Gimmel | Hay | Shin deriving (Show)
-  {- Player type:
-      [Char]  name: the player's name
-      Integer gelt: how much gelt (coins) they have
-      Integer index: their corresponding index in the Game's player list
-  -}
-  type Player  = ([Char], Integer, Integer)
-  {- Game type
-      Dreidel dreidel:  the Game's dreidel (spinning top)
-      Integer pot:      how much gelt is in the game's pot
-      [Player] players: the list of players in the game
-  type Game    = (Dreidel, Integer, [Player])
+  import Dreidel
+  import Player
+  type Game    = (Integer, [Player])
 
-  let INIT_GELT_AMNT = 25
-  let MAX_NUM_PLAYERS = 4
+  init_gelt_amnt = 25
+  max_num_players = 4
 
-  {-
-  sideValue :: Dreidel -> (Integer, [Char])
-  sideValue Num = (0, "Nun")
-  sideValue Gimmel = "
-  -}
+  getPot :: Game -> Integer
+  getPot (pot, player_list) = pot
 
-  {- spin the dreidel, arg is player number in the game
-    returns a function that updates a player in some way
-  -}
-  spin     :: Dreidel -> Integer -> Game -> Game
-  -}
+  getPlayerList :: Game -> [Player]
+  getPlayerList (pot, player_list) = player_list
 
-  spinResult :: Dreidel -> (Player, Game)
+  applyResult :: Side -> Integer -> Game -> Game
+  applyResult = undefined
 
-  geltAmnt :: Player -> Integer
-  geltAmnt :: (name, gelt) = value gelt
+  numPlayers :: Game -> Integer
+  numPlayers = length getPlayerList game
+
+  getPlayer :: Game -> Integer -> Player
+  getPlayer = getPlayerList game !! index
+
+  printPlayers :: [Player] -> IO ()
+  printPlayer [] = return ( )
+  printPlayer (head : tail) = do
+    let some_player = head
+    print "-> " ++ getName some_player
+    print "\thas " ++ getGelt some_player ++ "gelt"
+    printPlayer tail
 
   main :: IO ()
-  main
+  main = loop
+
+  loop :: Game -> Integer -> IO
+  loop game index = do
+    let curr_player = getPlayerList game !! index
+    -- determine if we want to skip this player
+    if (getGelt curr_player) <= 0
+      then return loop (game, ((index + 1) `mod` numPlayers)
+      else return ( )
+    side <- Dreidel.spin
+    let game_update = applyResult side index game
+    let player_update = getPlayer game_update index
+    if getGelt player_update <= 0
+      then print "Sorry, you're out " ++ getName player_update
+      else ( )
+    -- check if a player has won
+
+    -- end check if player wins
+    print "*** POT CONTAINS"
+    print (getPot game_update)
+    printPlayers (getPlayers game_update)
+    loop game_update ((index + 1) `mod` numPlayers)
