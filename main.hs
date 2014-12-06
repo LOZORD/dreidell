@@ -33,7 +33,7 @@ module Main where
     printPlayers tail
 
   main :: IO ()
-  main = loop
+  main = undefined
 
   loop :: Game -> Integer -> IO ()
   loop game index = do
@@ -46,7 +46,7 @@ module Main where
     -}
     side <- Dreidel.spin
     let game_update = applyResult side index game
-    let player_update = getPlayer game_update index
+    let player_update = getPlayer(game_update,index)
     if getGelt player_update <= 0
       then print ("Sorry, you're out " ++ (getName player_update))
       else return ( )
@@ -56,4 +56,4 @@ module Main where
     print "*** POT CONTAINS"
     print (getPot game_update)
     printPlayers (getPlayerList game_update)
-    loop game_update ((index + 1) `mod` numPlayers)
+    loop game_update ((index + 1) `mod` (numPlayers game))
