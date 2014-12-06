@@ -1,4 +1,4 @@
 all:
 	ghc main.hs
 clean:
-	rm *.o *.hi
+	rm -v *.o *.hi

@@ -19,7 +19,7 @@ module Main where
   applyResult = undefined
 
   numPlayers :: Game -> Integer
-  numPlayers = length getPlayerList
+  numPlayers game = toInteger (length (getPlayerList game))
 
   getPlayer :: Game -> Integer -> Player
   --getPlayer = getPlayerList !! index
@@ -32,7 +32,7 @@ module Main where
   printPlayers (head : tail) = do
     let some_player = head
     print "-> " ++ getName some_player
-    print "\thas " ++ getGelt some_player ++ "gelt"
+    print ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
 
   main :: IO ()
@@ -40,7 +40,7 @@ module Main where
 
   loop :: Game -> Integer -> IO ()
   loop game index = do
-    let curr_player = getPlayerList game !! index
+    let curr_player = getPlayerList game !! fromIntegral (index)
     -- determine if we want to skip this player
     {-
     if (getGelt curr_player) <= 0
@@ -51,7 +51,7 @@ module Main where
     let game_update = applyResult side index game
     let player_update = getPlayer game_update index
     if getGelt player_update <= 0
-      then print "Sorry, you're out " ++ getName player_update
+      then print ("Sorry, you're out " ++ (getName player_update))
       else return ( )
     -- check if a player has won
 
