@@ -21,17 +21,14 @@ module Main where
   numPlayers :: Game -> Integer
   numPlayers game = toInteger (length (getPlayerList game))
 
-  getPlayer :: Game -> Integer -> Player
-  --getPlayer = getPlayerList !! index
-  getPlayer (game, index) = do
-    let list = getPlayerList game
-    return list !! index
+  getPlayer :: (Game, Integer) -> Player
+  getPlayer (game, index) = ((getPlayerList(game)) !! fromIntegral (index))
 
   printPlayers :: [Player] -> IO ()
   printPlayers [] = return ( )
   printPlayers (head : tail) = do
     let some_player = head
-    print "-> " ++ getName some_player
+    print ("-> " ++ getName some_player)
     print ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
 
