@@ -19,39 +19,44 @@ module Main where
   applyResult = undefined
 
   numPlayers :: Game -> Integer
-  numPlayers = length getPlayerList game
+  numPlayers = length getPlayerList
 
   getPlayer :: Game -> Integer -> Player
-  getPlayer = getPlayerList game !! index
+  --getPlayer = getPlayerList !! index
+  getPlayer (game, index) = do
+    let list = getPlayerList game
+    return list !! index
 
   printPlayers :: [Player] -> IO ()
-  printPlayer [] = return ( )
-  printPlayer (head : tail) = do
+  printPlayers [] = return ( )
+  printPlayers (head : tail) = do
     let some_player = head
     print "-> " ++ getName some_player
     print "\thas " ++ getGelt some_player ++ "gelt"
-    printPlayer tail
+    printPlayers tail
 
   main :: IO ()
   main = loop
 
-  loop :: Game -> Integer -> IO
+  loop :: Game -> Integer -> IO ()
   loop game index = do
     let curr_player = getPlayerList game !! index
     -- determine if we want to skip this player
+    {-
     if (getGelt curr_player) <= 0
-      then return loop (game, ((index + 1) `mod` numPlayers)
+      then return (loop (game, ((index + 1) `mod` numPlayers))
       else return ( )
+    -}
     side <- Dreidel.spin
     let game_update = applyResult side index game
     let player_update = getPlayer game_update index
     if getGelt player_update <= 0
       then print "Sorry, you're out " ++ getName player_update
-      else ( )
+      else return ( )
     -- check if a player has won
 
     -- end check if player wins
     print "*** POT CONTAINS"
     print (getPot game_update)
-    printPlayers (getPlayers game_update)
+    printPlayers (getPlayerList game_update)
     loop game_update ((index + 1) `mod` numPlayers)
