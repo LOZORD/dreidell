@@ -1,10 +1,9 @@
-import System.Random
-
 module Dreidel where
-  let NUM_DREIDEL_SIDES = 4
+  import System.Random
+  num_dreidel_sides = 4
   data Side = Nun | Gimmel | Hay | Shin deriving (Show)
-  spin :: IO Spin
+  spin :: IO Side
   spin = do
-    n <- random :: IO Integer
-    let side = [Nun, Gimmel, Hay, Shin] !! (n `mod` NUM_DREIDEL_SIDES)
+    n <- randomIO :: IO Int
+    let side = [Nun, Gimmel, Hay, Shin] !! (n `mod` num_dreidel_sides)
     return side
