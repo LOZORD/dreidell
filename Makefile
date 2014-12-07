@@ -1,4 +1,4 @@
 all:
-	ghc main.hs
+	ghc Main.hs -o run_dreidell
 clean:
-	rm -v *.o *.hi main
+	rm -v *.o *.hi run_dreidell
