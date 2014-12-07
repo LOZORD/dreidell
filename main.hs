@@ -4,6 +4,8 @@
 module Main where
   import Dreidel
   import Player
+  import System.Exit
+
   type Game    = (Integer, [Player])
 
   init_gelt_amnt = 25
@@ -32,8 +34,15 @@ module Main where
     print ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
 
+  remainingPlayers :: Game -> [Player]
+  remainingPlayers(game) = do
+    let all_players = getPlayerList(game)
+    [some_player | some_player <- all_players, getGelt(some_player) > 0]
+
   main :: IO ()
   -- TODO
+  -- first set up the game
+  -- then loop
   main = undefined
 
   loop :: (Game, Integer) -> IO ()
@@ -48,14 +57,24 @@ module Main where
       else do
         side <- Dreidel.spin
         let game_update = applyResult(side, game, index)
+        let new_player_list = getPlayerList game_update
         let player_update = getPlayer(game_update,index)
         if getGelt player_update <= 0
           then print ("Sorry, you're out " ++ (getName player_update))
           else return ( )
         -- check if a player has won
-
-        -- end check if player wins
-        print "*** POT CONTAINS"
-        print (getPot game_update)
-        printPlayers (getPlayerList game_update)
-        loop (game_update, ((index + 1) `mod` (numPlayers game)))
+        if (length(remainingPlayers(game_update))) == 1
+          then do
+            let winner = head(remainingPlayers(game_update))
+            print "We have a winner!"
+            printPlayers([winner])
+            print ("Congrats " ++ (getName(winner)))
+            print "Thanks for playing. Now go eat a latke!"
+            exit <- exitSuccess :: IO a
+            return exit
+          else do
+            print "*** POT CONTAINS ***"
+            print (getPot game_update)
+            printPlayers (new_player_list)
+            loop (game_update, ((index + 1) `mod` (numPlayers game)))
+-- end main
