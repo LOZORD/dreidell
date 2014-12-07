@@ -73,11 +73,26 @@ module Main where
     let all_players = getPlayerList(game)
     [some_player | some_player <- all_players, getGelt(some_player) > 0]
 
+  buildPlayers :: [Player] -> [Player]
+  buildPlayers list = do
+    let curr_length = length(list)
+    if (curr_length < max_num_players)
+      then do
+        print "Please enter your name."
+        print "Or, if no other players, enter 'x'."
+        name <- getLine
+        if name == "x"
+          then list
+          else do
+            buildPlayers(list++[(name, init_gelt_amnt, curr_length + 1)])
+      else list
+
   main :: IO ()
-  -- TODO
   -- first set up the game
   -- then loop
-  main = undefined --TODO
+  main = do
+    print "Welcome to Dreidell, the forefront technology in Hanukkah games."
+    -- TODO buildPlayers, etc.
 
   loop :: (Game, Integer) -> IO ()
   loop (game, index) = do
