@@ -5,6 +5,7 @@ module Main where
   import Dreidel
   import Player
   import System.Exit
+  import Data.Char (isSpace)
 
   type Game = (Integer, [Player])
 
@@ -16,6 +17,10 @@ module Main where
 
   getPlayerList :: Game -> [Player]
   getPlayerList (pot, player_list) = player_list
+
+  trim :: String -> String
+  trim = f . f
+    where f = reverse . dropWhile isSpace
 
   updatePlayerList :: ([Player],Player) -> [Player]
   updatePlayerList(old_list, new_player) = do
@@ -80,11 +85,12 @@ module Main where
       then do
         print "Please enter your name."
         print "Or, if no other players, enter 'x'."
-        name <- getLine
-        if name == "x"
+        name <- trim(getLine())
+        if length(name) == 1 && (name !! 0) == 'x'
           then list
-          else do
-            buildPlayers(list++[(name, init_gelt_amnt, curr_length + 1)])
+          else if name == [] -- the empty string
+            then buildPlayers list
+            else buildPlayers(list++[(name, init_gelt_amnt, fromIntegral curr_length)])
       else list
 
   main :: IO ()
@@ -92,7 +98,9 @@ module Main where
   -- then loop
   main = do
     print "Welcome to Dreidell, the forefront technology in Hanukkah games."
-    -- TODO buildPlayers, etc.
+    let the_players = buildPlayers([])
+    let the_game = (init_gelt_amnt, the_players)
+    loop(the_game, 0)
 
   loop :: (Game, Integer) -> IO ()
   loop (game, index) = do
@@ -104,6 +112,8 @@ module Main where
         let next_player_index = (index + 1) `mod` (numPlayers(game))
         loop (game, next_player_index)
       else do
+        print ((getName(curr_player)) ++ ", press enter to spin the virtual dreidel!")
+        s <- getLine
         side <- Dreidel.spin
         game_update <- applyResult(side, game, index)
         let new_player_list = getPlayerList game_update

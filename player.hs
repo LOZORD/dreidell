@@ -1,7 +1,7 @@
 module Player where
-  type Player = ([Char], Integer, Integer)
+  type Player = (String, Integer, Integer)
 
-  getName :: Player -> [Char]
+  getName :: Player -> String
   getName (name, gelt, index) = name
 
   getGelt :: Player -> Integer
