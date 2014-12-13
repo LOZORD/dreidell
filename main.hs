@@ -67,8 +67,7 @@ module Main where
 
   printPlayers :: [Player] -> IO ()
   printPlayers [] = return ( )
-  printPlayers (head : tail) = do
-    let some_player = head
+  printPlayers (some_player : tail) = do
     print ("-> " ++ getName some_player)
     print ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
@@ -86,7 +85,7 @@ module Main where
         print "Please enter your name."
         print "Or, if no other players, enter 'x'."
         name <- trim(getLine())
-        if length(name) == 1 && (name !! 0) == 'x'
+        if length(name) == 1 && (head name) == 'x'
           then list
           else if name == [] -- the empty string
             then buildPlayers list
