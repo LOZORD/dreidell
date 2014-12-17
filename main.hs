@@ -77,20 +77,28 @@ module Main where
     let all_players = getPlayerList(game)
     [some_player | some_player <- all_players, getGelt(some_player) > 0]
 
+
+  askName :: IO String
+  askName = do
+    print "Please enter your name"
+    print "Or if no other players, enter 'x'"
+    getLine
+
+
+  --FIXME
   buildPlayers :: [Player] -> [Player]
   buildPlayers list = do
     let curr_length = length(list)
     if (curr_length < max_num_players)
       then do
-        print "Please enter your name."
-        print "Or, if no other players, enter 'x'."
-        name <- trim(getLine())
-        if length(name) == 1 && (head name) == 'x'
+        name <- askName
+        if length name == 1 && head name == 'x'
           then list
-          else if name == [] -- the empty string
+          else if (null name) -- the empty string
             then buildPlayers list
             else buildPlayers(list++[(name, init_gelt_amnt, fromIntegral curr_length)])
       else list
+  --buildPlayers list = undefined
 
   main :: IO ()
   -- first set up the game
