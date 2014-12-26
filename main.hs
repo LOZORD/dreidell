@@ -84,6 +84,14 @@ module Main where
     print "Or if no other players, enter 'x'"
     getLine
 
+  generateName :: Integer -> String
+  generateName i
+    | i == 0 = "Alice"
+    | i == 1 = "Bob"
+    | i == 2 = "Carol"
+    | i == 3 = "DreidelBot"
+    | i == 4 = "Ernesto"
+
 
   --FIXME
   buildPlayers :: [Player] -> [Player]
@@ -91,7 +99,8 @@ module Main where
     let curr_length = length(list)
     if (curr_length < max_num_players)
       then do
-        name <- askName
+        --name <- askName
+        let name = generateName $ fromIntegral curr_length
         if length name == 1 && head name == 'x'
           then list
           else if (null name) -- the empty string
