@@ -32,30 +32,30 @@ module Main where
   applyResult (side, game, player_index)
     | side == Nun = do
       -- do nothing
-      print ("Nun! (nothing happens...)")
+      putStrLn ("Nun! (nothing happens...)")
       return game
     | side == Gimmel = do
       -- this player wins the pot!
-      print ("Gimmel! " ++ (getName curr_player) ++ " won the entire pot!")
+      putStrLn ("Gimmel! " ++ (getName curr_player) ++ " won the entire pot!")
       let gelt_won = getPot game
       let new_player = ((getName curr_player), (getGelt curr_player) + gelt_won, getIndex curr_player)
       let new_game = (0, updatePlayerList((getPlayerList game), new_player))
       return new_game
     | side == Hay = do
       -- this player takes ceil(pot/2)!
-      print ("Hay! " ++ (getName curr_player) ++ " won half the pot!")
+      putStrLn ("Hay! " ++ (getName curr_player) ++ " won half the pot!")
       let gelt_won = ceiling(realToFrac(getPot game)/2)
       let new_player = ((getName curr_player), (getGelt curr_player) + gelt_won, getIndex curr_player)
       let new_game = ((getPot game) - gelt_won, updatePlayerList((getPlayerList game), new_player))
       return new_game
     | side == Shin = do
       -- put one gelt in the pot
-      print ("Shin! " ++ (getName curr_player) ++ " throws a coin in the pot.")
+      putStrLn ("Shin! " ++ (getName curr_player) ++ " throws a coin in the pot.")
       let new_player = (getName curr_player, getGelt curr_player - 1, getIndex curr_player)
       let new_game = (getPot game + 1, updatePlayerList((getPlayerList game), new_player))
       return new_game
     | otherwise = do
-      print ("That's a weird dreidel!")
+      putStrLn ("That's a weird dreidel!")
       return game
     where curr_player = (getPlayerList(game) !! fromIntegral(player_index))
 
@@ -68,8 +68,8 @@ module Main where
   printPlayers :: [Player] -> IO ()
   printPlayers [] = return ( )
   printPlayers (some_player : tail) = do
-    print ("-> " ++ getName some_player)
-    print ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
+    putStrLn ("-> " ++ getName some_player)
+    putStrLn ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
 
   remainingPlayers :: Game -> [Player]
@@ -80,8 +80,8 @@ module Main where
 
   askName :: IO String
   askName = do
-    print "Please enter your name"
-    print "Or if no other players, enter 'x'"
+    putStrLn "Please enter your name"
+    putStrLn "Or if no other players, enter 'x'"
     getLine
 
   generateName :: Integer -> String
@@ -113,7 +113,7 @@ module Main where
   -- first set up the game
   -- then loop
   main = do
-    print "Welcome to Dreidell, the forefront technology in Hanukkah games."
+    putStrLn "Welcome to Dreidell, the forefront technology in Hanukkah games."
     let the_players = buildPlayers([])
     let the_game = (init_gelt_amnt, the_players)
     loop(the_game, 0)
@@ -128,27 +128,27 @@ module Main where
         let next_player_index = (index + 1) `mod` (numPlayers(game))
         loop (game, next_player_index)
       else do
-        print ((getName(curr_player)) ++ ", press enter to spin the virtual dreidel!")
+        putStrLn ((getName(curr_player)) ++ ", press enter to spin the virtual dreidel!")
         s <- getLine
         side <- Dreidel.spin
         game_update <- applyResult(side, game, index)
         let new_player_list = getPlayerList game_update
         let player_update = getPlayer(game_update,index)
         if getGelt player_update <= 0
-          then print ("Sorry, you're out " ++ (getName player_update))
+          then putStrLn ("Sorry, you're out " ++ (getName player_update))
           else return ( )
         -- check if a player has won
         if (length(remainingPlayers(game_update))) == 1
           then do
             let winner = head(remainingPlayers(game_update))
-            print "We have a winner!"
+            putStrLn "We have a winner!"
             printPlayers([winner])
-            print ("Congrats " ++ (getName(winner)))
-            print "Thanks for playing. Now go eat a latke!"
+            putStrLn ("Congrats " ++ (getName(winner)))
+            putStrLn "Thanks for playing. Now go eat a latke!"
             exit <- exitSuccess :: IO a
             return exit
           else do
-            print "*** POT CONTAINS ***"
+            putStrLn "*** POT CONTAINS ***"
             print (getPot game_update)
             printPlayers (new_player_list)
             loop (game_update, ((index + 1) `mod` (numPlayers game)))
