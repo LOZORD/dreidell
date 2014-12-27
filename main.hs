@@ -72,11 +72,12 @@ module Main where
     putStrLn ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
     printPlayers tail
 
-  remainingPlayers :: Game -> [Player]
-  remainingPlayers(game) = do
-    let all_players = getPlayerList(game)
-    [some_player | some_player <- all_players, getGelt(some_player) > 0]
+  isInGame :: Player -> Bool
+  isInGame player = getGelt(player) > 0
 
+  remainingPlayers :: Game -> [Player]
+  remainingPlayers game = filter isInGame currentPlayers
+    where currentPlayers = getPlayerList game
 
   askName :: IO String
   askName = do
@@ -109,29 +110,38 @@ module Main where
       else list
   --buildPlayers list = undefined
 
+  placeAntes :: Game -> Game
+  placeAntes game = undefined
+
   main :: IO ()
   -- first set up the game
   -- then loop
   main = do
     putStrLn "Welcome to Dreidell, the forefront technology in Hanukkah games."
+    putStrLn "Everytime a new round begins, each player puts in 1 gelt."
+    putStrLn "Otherwise, the rules should be the same as classic dreidel."
     let the_players = buildPlayers([])
     let the_game = (init_gelt_amnt, the_players)
     loop(the_game, 0)
 
   loop :: (Game, Integer) -> IO ()
   loop (game, index) = do
-    let curr_player = getPlayerList game !! fromIntegral (index)
+    -- if it's a new round, players who are still in put 1 gold in the pot
+    let isAnteRound = (index `mod` (fromIntegral (length $ getPlayerList game))) == 0
+    --if isAnteRound then do putStrLn "*\tNEW ROUND\t*" else do putStrLn "(not a new round)"
+    let game' = if isAnteRound then (placeAntes game) else game
+    let curr_player = getPlayerList game' !! fromIntegral (index)
     -- determine if we want to skip this player
     if (getGelt curr_player) <= 0
       then do
         -- go onto the next player
         let next_player_index = (index + 1) `mod` (numPlayers(game))
-        loop (game, next_player_index)
+        loop (game', next_player_index)
       else do
         putStrLn ((getName(curr_player)) ++ ", press enter to spin the virtual dreidel!")
         s <- getLine
         side <- Dreidel.spin
-        game_update <- applyResult(side, game, index)
+        game_update <- applyResult(side, game', index)
         let new_player_list = getPlayerList game_update
         let player_update = getPlayer(game_update,index)
         if getGelt player_update <= 0
@@ -151,5 +161,5 @@ module Main where
             putStrLn "*** POT CONTAINS ***"
             print (getPot game_update)
             printPlayers (new_player_list)
-            loop (game_update, ((index + 1) `mod` (numPlayers game)))
+            loop (game_update, ((index + 1) `mod` (numPlayers game_update)))
 -- end main
