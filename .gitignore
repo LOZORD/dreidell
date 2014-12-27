@@ -15,5 +15,3 @@ cabal.config
 *.prof
 *.aux
 *.hp
-main
-run_dreidell
