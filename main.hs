@@ -7,10 +7,12 @@ module Main where
   import System.Exit
   import Data.Char (isSpace)
 
+  -- a game consists of a pot (Integer) and a list of players ([Player])
   type Game = (Integer, [Player])
 
-  init_gelt_amnt = 25
+  init_gelt_amnt = 10
   max_num_players = 4
+  ante_amnt = 2
 
   getPot :: Game -> Integer
   getPot (pot, player_list) = pot
@@ -69,7 +71,7 @@ module Main where
   printPlayers [] = return ( )
   printPlayers (some_player : tail) = do
     putStrLn ("-> " ++ getName some_player)
-    putStrLn ("\thas " ++ (show (getGelt some_player)) ++ "gelt")
+    putStrLn ("\thas " ++ (show (getGelt some_player)) ++ " gelt")
     printPlayers tail
 
   isInGame :: Player -> Bool
@@ -94,7 +96,6 @@ module Main where
     | i == 4 = "Ernesto"
 
 
-  --FIXME
   buildPlayers :: [Player] -> [Player]
   buildPlayers list = do
     let curr_length = length(list)
@@ -110,8 +111,16 @@ module Main where
       else list
   --buildPlayers list = undefined
 
+  takeAnte :: Player -> Player
+  takeAnte (_n, gelt, _i) = (_n, if (gelt > 0) then (max 0 (gelt - ante_amnt)) else 0, _i)
+
+  geltDiff :: Player -> Player -> Integer
+  geltDiff pA pB = (getGelt pA) - (getGelt pB)
+
   placeAntes :: Game -> Game
-  placeAntes game = undefined
+  placeAntes (pot, players) = (pot', players')
+    where players' = map takeAnte players
+          pot'     = pot + (sum $ zipWith geltDiff players players')
 
   main :: IO ()
   -- first set up the game
@@ -127,12 +136,12 @@ module Main where
   loop :: (Game, Integer) -> IO ()
   loop (game, index) = do
     -- if it's a new round, players who are still in put 1 gold in the pot
-    let isAnteRound = (index `mod` (fromIntegral (length $ getPlayerList game))) == 0
+    let isAnteRound = (index `mod` (fromIntegral $ numPlayers game)) == 0
     --if isAnteRound then do putStrLn "*\tNEW ROUND\t*" else do putStrLn "(not a new round)"
     let game' = if isAnteRound then (placeAntes game) else game
     let curr_player = getPlayerList game' !! fromIntegral (index)
     -- determine if we want to skip this player
-    if (getGelt curr_player) <= 0
+    if not (isInGame curr_player)
       then do
         -- go onto the next player
         let next_player_index = (index + 1) `mod` (numPlayers(game))
@@ -153,6 +162,7 @@ module Main where
             let winner = head(remainingPlayers(game_update))
             putStrLn "We have a winner!"
             printPlayers([winner])
+            putStrLn ("\t... in addition to " ++ show(getPot game_update) ++ " from the pot!")
             putStrLn ("Congrats " ++ (getName(winner)))
             putStrLn "Thanks for playing. Now go eat a latke!"
             exit <- exitSuccess :: IO a
