@@ -1,7 +1,7 @@
 # DREIDELL
 ## A simple dreidel (sivivon, spinning top, etc.)
 ## game in Haskell made by Leo Rudberg in 2014
-## for [Local Hack Day](localhackday.mlh.io)
+## for [Local Hack Day](http://localhackday.mlh.io)
 
 The game should follow the regular rules of classic dreidel.
 
@@ -25,4 +25,5 @@ feel free to change the source on for the `generateName` function on line 91.
 
 Obviously, you will need `ghc` to make these changes.
 
-Shoutouts to [Mike Tolly](https://github.com/mtolly) and [HH Lambda](https://www.facebook.com/groups/hhlambda/) for their help!
+Shoutouts to [Mike Tolly](https://github.com/mtolly)
+ and [HH Lambda](https://www.facebook.com/groups/hhlambda/) for their help!
